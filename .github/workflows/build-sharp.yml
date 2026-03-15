@@ -25,10 +25,48 @@ jobs:
             container: amazonlinux:2023
             ld_library_path: /usr/local/lib:/usr/local/lib64
             pkg_config_path: /usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig
+            install_cmd: |
+              curl -fsSL https://rpm.nodesource.com/setup_22.x | bash -
+              dnf group install -y "Development Tools"
+              dnf install -y \
+                clang \
+                cmake \
+                expat-devel \
+                glib2-devel \
+                highway-devel \
+                libexif-devel \
+                libimagequant-devel \
+                librsvg2-devel \
+                libtiff-devel \
+                libwebp-devel \
+                meson \
+                nasm \
+                nodejs
           - target: debian
             container: debian:12-slim
             ld_library_path: /usr/local/lib:/usr/local/lib64:/usr/local/lib/aarch64-linux-gnu
             pkg_config_path: /usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/lib/aarch64-linux-gnu/pkgconfig
+            install_cmd: |
+              apt-get update
+              apt-get install -y curl ca-certificates gnupg
+              curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+              apt-get install -y \
+                build-essential \
+                clang \
+                cmake \
+                libexpat1-dev \
+                libglib2.0-dev \
+                libhwy-dev \
+                libexif-dev \
+                libimagequant-dev \
+                librsvg2-dev \
+                libtiff-dev \
+                libwebp-dev \
+                meson \
+                nasm \
+                nodejs \
+                pkg-config \
+                ninja-build
     env:
       SHARP_VERSION: ${{ inputs.sharp_version }}
       VIPS_VERSION: ${{ inputs.vips_version }}
@@ -45,49 +83,8 @@ jobs:
       LD_LIBRARY_PATH: ${{ matrix.ld_library_path }}
       PKG_CONFIG_PATH: ${{ matrix.pkg_config_path }}
     steps:
-      - name: Install dependencies (AL2023)
-        if: matrix.target == 'al2023'
-        run: |
-          curl -fsSL https://rpm.nodesource.com/setup_22.x | bash -
-          dnf group install -y "Development Tools"
-          dnf install -y \
-            clang \
-            cmake \
-            expat-devel \
-            glib2-devel \
-            highway-devel \
-            libexif-devel \
-            libimagequant-devel \
-            librsvg2-devel \
-            libtiff-devel \
-            libwebp-devel \
-            meson \
-            nasm \
-            nodejs
-
-      - name: Install dependencies (Debian)
-        if: matrix.target == 'debian'
-        run: |
-          apt-get update
-          apt-get install -y curl ca-certificates gnupg
-          curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-          apt-get install -y \
-            build-essential \
-            clang \
-            cmake \
-            libexpat1-dev \
-            libglib2.0-dev \
-            libhwy-dev \
-            libexif-dev \
-            libimagequant-dev \
-            librsvg2-dev \
-            libtiff-dev \
-            libwebp-dev \
-            meson \
-            nasm \
-            nodejs \
-            pkg-config \
-            ninja-build
+      - name: Install dependencies
+        run: ${{ matrix.install_cmd }}
 
       - name: Download tarballs
         run: |
