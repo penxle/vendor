@@ -1,2 +1,2 @@
 # vendor
-Vendor binaries for typie
+Vendor binaries
