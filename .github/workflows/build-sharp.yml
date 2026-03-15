@@ -6,11 +6,11 @@ on:
       sharp_version:
         description: 'Sharp version'
         required: true
-        default: '0.34.2'
+        default: '0.34.5'
       vips_version:
         description: 'libvips version'
         required: true
-        default: '8.17.2'
+        default: '8.18.0'
 
 jobs:
   build:
